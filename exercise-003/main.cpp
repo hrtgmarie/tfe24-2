@@ -7,6 +7,17 @@
 #include <random>
 #include <vector>
 
+static void print_vector(const std::vector<int> &v)
+{
+    fmt::print("[");
+    for (std::size_t i = 0; i < v.size(); ++i)
+    {
+        if (i > 0) fmt::print(", ");
+        fmt::print("{}", v[i]);
+    }
+    fmt::print("]\n");
+}
+
 auto main(int argc, char **argv) -> int
 {
     /**
@@ -47,6 +58,24 @@ auto main(int argc, char **argv) -> int
     {
         v = dist(rng);
     }
+
+    // print the unsorted vector
+    // fmt::print("Unsortiert ({} Elemente):\n", values.size());
+    // print_vector(values);
+
+    // Zeitmessung der Sortierung
+    auto start = std::chrono::system_clock::now();
+    std::sort(values.begin(), values.end());
+    auto end = std::chrono::system_clock::now();
+
+    // print sorted vector 
+    // fmt::print("Sortiert:\n");
+    // print_vector(values);
+
+    // time of the sorting algorithm in milliseconds
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    fmt::print("Sortierdauer: {} ms\n", elapsed.count());
+
 
     return 0; /* exit gracefully*/
 }
