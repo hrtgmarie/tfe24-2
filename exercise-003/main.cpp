@@ -14,6 +14,9 @@ auto main(int argc, char **argv) -> int
     try
     {
         app.set_version_flag("-V,--version", fmt::format("{} {}", PROJECT_VER, PROJECT_BUILD_DATE));
+        // Option "count" mit Default 20
+        std::size_t count = 20;
+        app.add_option("-c,--count", count, "Anzahl der Zufallswerte")->default_val("20");
         app.parse(argc, argv);
     }
     catch (const CLI::ParseError &e)
@@ -27,8 +30,6 @@ auto main(int argc, char **argv) -> int
      * More info at https://fmt.dev/latest/api.html
      */
     fmt::print("Hello, {}!\n", app.get_name());
-
-    /* INSERT YOUR CODE HERE */
 
     return 0; /* exit gracefully*/
 }
