@@ -4,6 +4,20 @@
 #include "CLI/CLI.hpp"
 #include "config.h"
 
+#include <random>
+#include <vector>
+
+static void print_vector(const std::vector<int> &v)
+{
+    fmt::print("[");
+    for (std::size_t i = 0; i < v.size(); ++i)
+    {
+        if (i > 0) fmt::print(", ");
+        fmt::print("{}", v[i]);
+    }
+    fmt::print("]\n");
+}
+
 auto main(int argc, char **argv) -> int
 {
     /**
@@ -11,9 +25,11 @@ auto main(int argc, char **argv) -> int
      * More info at https://github.com/CLIUtils/CLI11#usage
      */
     CLI::App app{PROJECT_NAME};
+    auto count = 20;
     try
     {
         app.set_version_flag("-V,--version", fmt::format("{} {}", PROJECT_VER, PROJECT_BUILD_DATE));
+        app.add_option("-c,--count", count, "Anzahl der Zufallswerte")->default_val("20");
         app.parse(argc, argv);
     }
     catch (const CLI::ParseError &e)
@@ -27,8 +43,39 @@ auto main(int argc, char **argv) -> int
      * More info at https://fmt.dev/latest/api.html
      */
     fmt::print("Hello, {}!\n", app.get_name());
+    fmt::print("count = {}\n", count);
 
-    /* INSERT YOUR CODE HERE */
+    // vector the size of count
+    // fill the vector with random values between 1 and 100
+    std::vector<int> values;
+    values.resize(count);
+
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    std::uniform_int_distribution<int> dist(1, 100);
+
+    for (auto &v : values)
+    {
+        v = dist(rng);
+    }
+
+    // print the unsorted vector
+    // fmt::print("Unsortiert ({} Elemente):\n", values.size());
+    // print_vector(values);
+
+    // Zeitmessung der Sortierung
+    auto start = std::chrono::system_clock::now();
+    std::sort(values.begin(), values.end());
+    auto end = std::chrono::system_clock::now();
+
+    // print sorted vector 
+    // fmt::print("Sortiert:\n");
+    // print_vector(values);
+
+    // time of the sorting algorithm in milliseconds
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    fmt::print("the sorting took {} ms\n", elapsed.count());
+
 
     return 0; /* exit gracefully*/
 }
