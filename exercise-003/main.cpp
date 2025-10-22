@@ -74,7 +74,7 @@ auto main(int argc, char **argv) -> int
 
     // time of the sorting algorithm in milliseconds
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    fmt::print("Sortierdauer: {} ms\n", elapsed.count());
+    fmt::print("the sorting took {} ms\n", elapsed.count());
 
 
     return 0; /* exit gracefully*/
