@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <utility>
 #include <cmath>
+#include <fmt/format.h>
 
 template <typename T>
 class Point {
@@ -28,12 +29,20 @@ public:
     auto operator*(U s) const -> Point<std::common_type_t<T, U>>;
 };
 
-// Prevent implicit instantiation in other TUs for the concrete types we provide here
+// explizite Instantiierungen (Deklaration) für die in cpp instanzierten Typen
 extern template class Point<int>;
 extern template class Point<double>;
 
+// fmt formatter template — muss im Header stehen, damit fmt::print funktioniert
 namespace fmt {
-    // forward declare concrete formatter specializations (definitions in cpp)
-    template<> struct formatter<Point<int>>;
-    template<> struct formatter<Point<double>>;
-}
+template <typename T>
+struct formatter<Point<T>> {
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Point<T>& p, FormatContext& ctx) const {
+        return format_to(ctx.out(), "({}, {})", p.x, p.y);
+    }
+};
+} // namespace fmt

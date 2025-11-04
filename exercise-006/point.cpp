@@ -1,10 +1,8 @@
 #include "point.hpp"
 
-#include <fmt/core.h>
 #include <cmath>
-#include <type_traits>
 
-// Definitions for template members
+// Definitionen der Template-Methoden
 template <typename T>
 Point<T>::Point() noexcept : x(static_cast<T>(0)), y(static_cast<T>(0)) {}
 
@@ -52,34 +50,6 @@ auto Point<T>::operator*(U s) const -> Point<std::common_type_t<T, U>> {
                     static_cast<R>(y) * static_cast<R>(s));
 }
 
-// Explicit instantiations for the types we want to support
+// Explizite Instantiierung der gewünschten Typen
 template class Point<int>;
 template class Point<double>;
-
-// fmt formatter specializations for concrete Point types
-namespace fmt {
-
-template <>
-struct formatter<Point<int>> {
-    // parse not needed; use default behavior
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx) { return ctx.begin(); }
-
-    template <typename FormatContext>
-    auto format(const Point<int>& p, FormatContext& ctx) const {
-        return format_to(ctx.out(), "({}, {})", p.x, p.y);
-    }
-};
-
-template <>
-struct formatter<Point<double>> {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx) { return ctx.begin(); }
-
-    template <typename FormatContext>
-    auto format(const Point<double>& p, FormatContext& ctx) const {
-        return format_to(ctx.out(), "({}, {})", p.x, p.y);
-    }
-};
-
-} // namespace fmt
