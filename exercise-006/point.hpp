@@ -1,33 +1,39 @@
 #pragma once
 
+#include <type_traits>
+#include <utility>
 #include <cmath>
-#include <fmt/core.h>
-#include <nlohmann/json.hpp>
 
-class Point
-{
+template <typename T>
+class Point {
+    static_assert(std::is_arithmetic<T>::value, "Point<T>: T must be arithmetic");
 public:
-    double x_{0.0};
-    double y_{0.0};
+    T x;
+    T y;
 
-    Point() noexcept = default;
-    Point(double x, double y) noexcept : x_{x}, y_{y} {}
-    ~Point() = default;
+    Point() noexcept;
+    Point(T x_, T y_) noexcept;
 
-    void move(double dx, double dy) noexcept { x_ += dx; y_ += dy; }
-    void print() const { fmt::print("({}, {})\n", x_, y_); }
-    double distance_to(const Point &other) const noexcept {
-        const double dx = x_ - other.x_;
-        const double dy = y_ - other.y_;
-        return std::sqrt(dx*dx + dy*dy);
-    }
+    void move(T dx, T dy) noexcept;
+
+    using dist_t = std::common_type_t<T, double>;
+    auto distance_to(const Point& other) const -> dist_t;
+
+    bool operator==(const Point& rhs) const noexcept;
+    bool operator!=(const Point& rhs) const noexcept;
+    Point operator+(const Point& rhs) const noexcept;
+    Point operator-(const Point& rhs) const noexcept;
+
+    template <typename U>
+    auto operator*(U s) const -> Point<std::common_type_t<T, U>>;
 };
 
-// JSON helpers (nlohmann::json)
-inline void to_json(nlohmann::json &j, const Point &p) {
-    j = nlohmann::json{{"x", p.x_}, {"y", p.y_}};
-}
-inline void from_json(const nlohmann::json &j, Point &p) {
-    j.at("x").get_to(p.x_);
-    j.at("y").get_to(p.y_);
+// Prevent implicit instantiation in other TUs for the concrete types we provide here
+extern template class Point<int>;
+extern template class Point<double>;
+
+namespace fmt {
+    // forward declare concrete formatter specializations (definitions in cpp)
+    template<> struct formatter<Point<int>>;
+    template<> struct formatter<Point<double>>;
 }
