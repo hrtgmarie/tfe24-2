@@ -53,3 +53,7 @@ auto Point<T>::operator*(U s) const -> Point<std::common_type_t<T, U>> {
 // Explizite Instantiierung der gewünschten Typen
 template class Point<int>;
 template class Point<double>;
+
+// wenn operator* als member-template in point.cpp definiert ist, dann explizit instantiieren:
+template auto Point<int>::operator*<int>(int) const -> Point<std::common_type_t<int,int>>;
+template auto Point<double>::operator*<double>(double) const -> Point<std::common_type_t<double,double>>;
