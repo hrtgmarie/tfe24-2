@@ -4,47 +4,99 @@
 #include <cstddef>
 #include <stdexcept>
 #include <algorithm>
-#include <utility>
 
-namespace mystd {
+namespace tfe24 {
 
+/// \brief Ein einfacher dynamischer Vektor ähnlich std::vector.
+/// \tparam T Elementtyp.
+/// \invariant 0 <= size() <= capacity()
+/// \exception std::out_of_range bei ungültigem Index für at().
 template<typename T>
 class myvector {
 public:
-    // Konstruktoren
+    /// Standardkonstruktor - erstellt einen leeren Vektor
     myvector() noexcept;
+    
+    /// Konstruktor mit Größe - erstellt Vektor mit count Elementen
+    /// \param count Anzahl der zu erstellenden Elemente
     explicit myvector(size_t count);
     
-    // Destruktor
+    /// Destruktor - gibt reservierten Speicher frei
     ~myvector();
     
-    // Rule of Three
+    /// Copy-Konstruktor - erzeugt unabhängige Kopie (Rule of Three)
     myvector(const myvector& other);
+    
+    /// Copy-Zuweisungsoperator - erzeugt unabhängige Kopie (Rule of Three)
     myvector& operator=(const myvector& other);
     
-    // Zentrale Methoden
+    // === Minimal geforderte öffentliche Schnittstelle ===
+    
+    /// \brief Fügt Element am Ende hinzu
+    /// \param value Zu kopierendes Element
+    /// \complexity Amortisiert O(1)
     void push_back(const T& value);
-    T& at(size_t index);
+    
+    /// \brief Zugriff mit Grenzenprüfung (const-Version)
+    /// \param index Elementindex
+    /// \return Referenz auf das Element
+    /// \throws std::out_of_range wenn index >= size()
+    /// \complexity O(1)
     const T& at(size_t index) const;
+    
+    /// \brief Zugriff mit Grenzenprüfung (non-const-Version)
+    /// \param index Elementindex
+    /// \return Referenz auf das Element
+    /// \throws std::out_of_range wenn index >= size()
+    /// \complexity O(1)
+    T& at(size_t index);
+    
+    /// \brief Unsicherer Zugriff ohne Grenzenprüfung
+    /// \param index Elementindex
+    /// \return Referenz auf das Element
+    /// \complexity O(1)
     T& operator[](size_t index);
+    
+    /// \brief Unsicherer Zugriff ohne Grenzenprüfung (const-Version)
+    /// \param index Elementindex
+    /// \return Referenz auf das Element
+    /// \complexity O(1)
     const T& operator[](size_t index) const;
     
+    /// \brief Anzahl der Elemente
+    /// \return Aktuelle Größe
+    /// \complexity O(1)
     size_t size() const noexcept;
+    
+    /// \brief Verfügbare Kapazität (ohne Reallocation)
+    /// \return Reservierter Speicherplatz
+    /// \complexity O(1)
     size_t capacity() const noexcept;
     
+    /// \brief Reserviert Speicher für mindestens new_cap Elemente
+    /// \param new_cap Gewünschte Kapazität
+    /// \complexity O(n) wenn Vergrößerung nötig, O(1) sonst
     void reserve(size_t new_cap);
+    
+    /// \brief Ändert die Größe des Vektors
+    /// \param new_size Neue Größe
+    /// \complexity O(new_size) bei Vergrößerung, O(1) bei Verkleinerung
     void resize(size_t new_size);
+    
+    /// \brief Entfernt alle Elemente (Speicher bleibt erhalten)
+    /// \complexity O(1)
     void clear() noexcept;
 
 private:
-    T* m_data;
-    size_t m_size;
-    size_t m_capacity;
+    T* m_data;          ///< Zeiger auf Speicher
+    size_t m_size;      ///< Aktuelle Anzahl Elemente
+    size_t m_capacity;  ///< Verfügbare Kapazität
     
+    /// Interne Methode: Speicher neu allokieren
     void reallocate(size_t new_cap);
 };
 
-// Implementierung der Template-Methoden (muss im Header sein)
+// === Template-Implementierung (im Header notwendig) ===
 
 template<typename T>
 myvector<T>::myvector() noexcept 
@@ -55,7 +107,7 @@ template<typename T>
 myvector<T>::myvector(size_t count) 
     : m_data(nullptr), m_size(count), m_capacity(count) {
     if (count > 0) {
-        m_data = new T[count]();  // Wertinitialisierung
+        m_data = new T[count]();
     }
 }
 
@@ -76,7 +128,6 @@ myvector<T>::myvector(const myvector& other)
 template<typename T>
 myvector<T>& myvector<T>::operator=(const myvector& other) {
     if (this != &other) {
-        // Copy-and-swap Idiom für Exception Safety
         T* new_data = nullptr;
         if (other.m_capacity > 0) {
             new_data = new T[other.m_capacity];
@@ -103,7 +154,7 @@ void myvector<T>::push_back(const T& value) {
 template<typename T>
 T& myvector<T>::at(size_t index) {
     if (index >= m_size) {
-        throw std::out_of_range("myvector::at: index out of range");
+        throw std::out_of_range("myvector::at() - index out of range");
     }
     return m_data[index];
 }
@@ -111,7 +162,7 @@ T& myvector<T>::at(size_t index) {
 template<typename T>
 const T& myvector<T>::at(size_t index) const {
     if (index >= m_size) {
-        throw std::out_of_range("myvector::at: index out of range");
+        throw std::out_of_range("myvector::at() const - index out of range");
     }
     return m_data[index];
 }
@@ -148,12 +199,6 @@ void myvector<T>::resize(size_t new_size) {
     if (new_size > m_capacity) {
         reserve(new_size);
     }
-    
-    // Neue Elemente wertinitialisieren
-    for (size_t i = m_size; i < new_size; ++i) {
-        m_data[i] = T();
-    }
-    
     m_size = new_size;
 }
 
@@ -164,17 +209,15 @@ void myvector<T>::clear() noexcept {
 
 template<typename T>
 void myvector<T>::reallocate(size_t new_cap) {
-    T* new_data = new T[new_cap];
-    
-    // Kopiere alte Elemente
-    size_t elements_to_copy = (m_size < new_cap) ? m_size : new_cap;
-    std::copy(m_data, m_data + elements_to_copy, new_data);
-    
-    delete[] m_data;
+    T* new_data = new T[new_cap]();
+    if (m_data != nullptr) {
+        std::copy(m_data, m_data + m_size, new_data);
+        delete[] m_data;
+    }
     m_data = new_data;
     m_capacity = new_cap;
 }
 
-} // namespace mystd
+} // namespace tfe24
 
 #endif // MYVECTOR_HPP
