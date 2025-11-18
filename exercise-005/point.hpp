@@ -6,10 +6,9 @@ class Point {
         Point();
         Point(double x, double y);
         ~Point() = default;
-        void move(int dx, int dy) { x_ += dx; y_ += dy; }
+        void move(int dx, int dy);
         void print() const;
         double distance_to(const Point &other) const;
-    public: 
         double x_;
         double y_;
 };

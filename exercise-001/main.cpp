@@ -3,8 +3,15 @@
 
 #include "config.h"
 
-void changeValueByParameter(int value);
-void changeValueByReference(int& ref);
+void changeValueByParameter(int value)
+{
+    value = 99;
+}
+
+void changeValueByReference(int& value)
+{
+    value = 77;
+}
 
 auto main(int argc, char **argv) -> int
 {
@@ -29,24 +36,24 @@ auto main(int argc, char **argv) -> int
      */
     fmt::print("Hello, {}!\n", tfe24::PROJECT_NAME);
 
-    int x = 10;
-    int y = 4711;
-
-    int& ref = x; // ref is a reference to x
-    ref = y;
-
-    fmt::print("x = {}, ref = {}\n", x, ref);
-    ref = 20; // changing ref changes x
-    fmt::print("x = {}, ref = {}\n", x, ref);
+    int x = 10; 
+    int& ref_x = x;
+    fmt::print("x = {}, ref_x = {}\n", x, ref_x);
+    ref_x = 42;
+    fmt::print("x = {}, ref_x = {}\n", x, ref_x);
 
     changeValueByParameter(x);
-    fmt::println("After changeValueByParameter(x): x = {}, ref = {}", x, ref);
+    fmt::print("x = {}, ref_x = {}\n", x, ref_x);
 
-    changeValueByReference(x);
-    fmt::println("After changeValueByReference(x): x = {}, ref = {}", x, ref);
-    
-    Foo foo(ref);
-    foo.print();
+    changeValueByReference(ref_x);
+    fmt::print("x = {}, ref_x = {}\n", x, ref_x);
+
+    int y = 5;
+    fmt::print("befor using y = {}\n", y);
+    changeValueByParameter(y);
+    fmt::print("changeValueByParameter y = {}\n", y);
+    changeValueByReference(y);
+    fmt::print("changeValueByReference y = {}\n", y);
 
     return 0; /* exit gracefully*/
 }

@@ -4,8 +4,19 @@
 #include "CLI/CLI.hpp"
 #include "config.h"
 
-#include <algorithm> /* needed for the std::sort */
 #include <random>
+#include <vector>
+
+static void print_vector(const std::vector<int> &v)
+{
+    fmt::print("[");
+    for (std::size_t i = 0; i < v.size(); ++i)
+    {
+        if (i > 0) fmt::print(", ");
+        fmt::print("{}", v[i]);
+    }
+    fmt::print("]\n");
+}
 
 auto main(int argc, char **argv) -> int
 {
@@ -14,11 +25,12 @@ auto main(int argc, char **argv) -> int
      * CLI11 is a command line parser to add command line options
      * More info at https://github.com/CLIUtils/CLI11#usage
      */
-    CLI::App app{"Strava for std::vectors"};
+    CLI::App app{PROJECT_NAME};
+    auto count = 20;
     try
     {
         app.set_version_flag("-V,--version", fmt::format("{} {}", PROJECT_VER, PROJECT_BUILD_DATE));
-        app.add_option("-c,--count", counter, "An counter option")->default_val("3");
+        app.add_option("-c,--count", count, "Anzahl der Zufallswerte")->default_val("20");
         app.parse(argc, argv);
     }
     catch (const CLI::ParseError &e)
@@ -32,41 +44,39 @@ auto main(int argc, char **argv) -> int
      * More info at https://fmt.dev/latest/api.html
      */
     fmt::print("Hello, {}!\n", app.get_name());
-    fmt::print("The counter value is: {}!\n", counter);
+    fmt::print("count = {}\n", count);
 
-        // Seed with a real random value, if available
-    std::random_device r;
+    // vector the size of count
+    // fill the vector with random values between 1 and 100
+    std::vector<int> values;
+    values.resize(count);
 
-    // Choose a random mean between 1 and 100
-    // https://en.cppreference.com/w/cpp/numeric/random.html
-    std::default_random_engine e1(r());
-    std::uniform_int_distribution<int> uniform_dist(1, 100);
-    int rand_value = uniform_dist(e1);
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    std::uniform_int_distribution<int> dist(1, 100);
 
-    std::vector<unsigned int> numbers;
-    auto start = std::chrono::system_clock::now();
-    for (int i = 0; i < counter; i++)
+    for (auto &v : values)
     {
-        numbers.push_back(uniform_dist(e1));
+        v = dist(rng);
     }
+
+    // print the unsorted vector
+    // fmt::print("Unsortiert ({} Elemente):\n", values.size());
+    // print_vector(values);
+
+    // Zeitmessung der Sortierung
+    auto start = std::chrono::system_clock::now();
+    std::sort(values.begin(), values.end());
     auto end = std::chrono::system_clock::now();
 
-    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    fmt::println("The inserting took: {}", elapsed);
-    fmt::println("The random vector: [ {} ]", fmt::join(numbers, ", "));
+    // print sorted vector 
+    // fmt::print("Sortiert:\n");
+    // print_vector(values);
 
-    fmt::println("Let's sort the numbers vector");
-    fmt::println("--------------------------------------------------------------------------");
+    // time of the sorting algorithm in milliseconds
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    fmt::print("the sorting took {} ms\n", elapsed.count());
 
-    start = std::chrono::system_clock::now();
-    std::sort(numbers.begin(), numbers.end(), std::less<int>());
-    end = std::chrono::system_clock::now();
-
-    fmt::println("The sorted numbers vector");
-    fmt::println("--------------------------------------------------------------------------");
-    fmt::println("The sorted vector: [ {} ]", fmt::join(numbers, ", "));
-    const auto elapsed_sort = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    fmt::println("The sorting took: {}", elapsed_sort);
 
     return 0; /* exit gracefully*/
 }

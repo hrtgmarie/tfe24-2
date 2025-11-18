@@ -3,13 +3,17 @@
 
 #include "config.h"
 
-void changeValueByParameter(int value) {
-    value = 42;
-}
+void changeValueByParameter(int value)
+{
+    value = 99;
+    fmt::print("Value inside function: {}\n", value);
+};
 
-void changeValueByPointer(double* ptr) {
-    *ptr = 42;
-}
+void changeValueByPointer(int * ptr) 
+{
+    *ptr = 99;
+    fmt::print("Value inside function: {}\n", *ptr);
+};
 
 auto main(int argc, char **argv) -> int
 {
@@ -21,43 +25,32 @@ auto main(int argc, char **argv) -> int
      */
     fmt::print("Hello, {}!\n", tfe24::PROJECT_NAME);
 
-    int x = 10;
-    int *p = &x;
-    
-    fmt::println("The value of x: {},             the address of x:{}",x, fmt::ptr(&x));
-    fmt::println("The value p is pointing to: {}, the address of p:{}",*p, fmt::ptr(p));
-
-    // change the vale of the variable p is pointing at
+    int x = 10; 
+    int * p = &x;
+    fmt::print("value of x {}!\n", x);
+    fmt::print("address of x {}!\n",fmt::ptr(&x));
+    fmt::print("inhalt von p {}!\n", fmt::ptr(p));
+    fmt::print("Wert auf den p zeigt {}!\n", *p);
     *p = 42;
-    fmt::println("The value p is pointing to: {}, the address of p:{}",*p, fmt::ptr(p));
-    fmt::println("The value of x: {},             the address of x:{}",x, fmt::ptr(&x));
+    fmt::print("value of x {}!\n", x);
+    fmt::print("Wert auf den p zeigt  {}!\n", *p);
 
-    // Let's double the fun
-    double bar = 100.001;
-    double* pD = &bar;
+    double* doublePointer = new double(3.1415);
+    fmt::print("value of doublePointer: {}\n", *doublePointer);
+    fmt::print("address in doublePointer: {}\n", fmt::ptr(doublePointer));
+    delete doublePointer;
 
-    fmt::println("The value pD is pointing to: {}, the address of pD:{}",*pD, fmt::ptr(pD));
-    fmt::println("The value of x: {},             the address of x:{}",bar, fmt::ptr(&bar));
+    int value = 10;
+    fmt::print("Value before function call: {}\n", value);
+    changeValueByParameter(value);
+    fmt::print("Value after function call: {}\n", value);
 
-    pD = new double(3.1415);
-    fmt::println("The value pD is pointing to: {}, the address of pD:{}",*pD, fmt::ptr(pD));
-    fmt::println("The value of x: {},             the address of x:{}",bar, fmt::ptr(&bar));
+    int value2 = 10;
+    int * ptrToValue2 = &value2;
+    fmt::print("Value before function call: {}\n", value2);
+    changeValueByPointer(ptrToValue2);
+    fmt::print("Value after function call: {}\n", value2);
 
-
-    *pD = 47.11;
-    fmt::println("The value pD is pointing to: {}, the address of pD:{}",*pD, fmt::ptr(pD));
-    fmt::println("The value of x: {},             the address of x:{}",bar, fmt::ptr(&bar));
-
-    fmt::println("The value of bar is {}, the address of bar:{}",bar, fmt::ptr(&bar));
-    changeValueByParameter(bar);
-    fmt::println("After the call to changeValueByParameter");
-    fmt::println("The value of bar is {}, the address of bar:{}",bar, fmt::ptr(&bar));
-
-    fmt::println("The value pD is pointing to: {}, the address of pD:{}",*pD, fmt::ptr(pD));
-    changeValueByPointer(pD);
-    fmt::println("After the call to changeValueByPointer");
-    fmt::println("The value pD is pointing to: {}, the address of pD:{}",*pD, fmt::ptr(pD));
-    
 
     delete pD;
     return 0; /* exit gracefully*/

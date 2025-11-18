@@ -3,7 +3,8 @@
 #include <cmath>
 
 Point::Point(){
-
+    x_ = 0;
+    y_ = 0;
 }
 
 Point::Point(double x, double y){
@@ -15,6 +16,12 @@ Point::Point(double x, double y){
 void Point::print() const
 {
     fmt::print("({}, {})\n", x_, y_);
+}
+
+void Point::move(int dx, int dy)
+{
+    x_ += dx;
+    y_ += dy;
 }
 
 double Point::distance_to(const Point &other) const

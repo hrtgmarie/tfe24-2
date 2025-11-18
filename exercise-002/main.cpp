@@ -4,31 +4,13 @@
 #include "CLI/CLI.hpp"
 #include "config.h"
 
-// global variables in the various segments
+// Teil 1: Globale Variable (Data-Segment)
+int globalVar = 1;
 
-int bss;
-int bss1 = 0;
-
-int data = 23;
-static int data1 = 29;
-
-const int rodata = 4711;
-const int rodata1 = 4712;
-
+// Teil 4: Funktion (Code-Segment)
 void foo() {
-    int var = 10;
-    var = var + 12;
-    fmt::println("Hello from foo!");
-    fmt::println("The value of var is: {}, the address of var: {}", var, fmt::ptr(&var)); 
+    fmt::print("Hello from foo!\n");
 }
-
-void static_foo() {
-    static int var = 10;
-    var = var + 12;
-    fmt::println("Hello from foo!");
-    fmt::println("The value of var is: {}, the address of var: {}", var, fmt::ptr(&var)); 
-}
-
 
 auto main(int argc, char **argv) -> int
 {
@@ -58,55 +40,39 @@ auto main(int argc, char **argv) -> int
      */
     fmt::print("Hello, {}!\n", app.get_name());
 
-    
-    fmt::println("The value of the variable bss: {} and its address {}", bss, fmt::ptr(&bss));
-    fmt::println("The value of the variable bss1: {} and its address {}", bss1, fmt::ptr(&bss1));
+    // Teil 2: Lokale Variable (Stack)
+    int localVar = 2;
 
-    fmt::println("The value of the variable data: {} and its address {}", data, fmt::ptr(&data));
-    fmt::println("The value of the variable data1: {} and its address {}", data1, fmt::ptr(&data1));
-
-    fmt::println("The value of the variable rodata: {} and its address {}", rodata, fmt::ptr(&rodata));
-    fmt::println("The value of the variable rodata1: {} and its address {}", rodata1, fmt::ptr(&rodata1));
-
-    fmt::println("------------------------------------------------------------------------------------------------");
-    fmt::println("The value of the variable localVar: {} and its address {}", localVar, fmt::ptr(&localVar));
-    fmt::println("The value of the variable localVar1: {} and its address {}", localVar1, fmt::ptr(&localVar1));
-
-    fmt::println("------------------------------------------------------------------------------------------------");
-
-    int localVar2 = 4;
-    const int localVar3 = 6;
-    fmt::println("The value of the variable localVar2: {} and its address {}", localVar2, fmt::ptr(&localVar2));
-    fmt::println("The value of the variable localVar3: {} and its address {}", localVar3, fmt::ptr(&localVar3));
-
-    fmt::println("------------------------------------------------------------------------------------------------");
-
+    // Teil 3: Dynamisch allozierte Variable (Heap)
     int* heapVar = new int(3);
-    int* heapVar1 = new int[3];
-    fmt::println("The value of the variable heapVar: {} and its address {}", *heapVar, fmt::ptr(heapVar));
-    fmt::println("The value of the variable heapVar1: {} and its address {}", heapVar1[0], fmt::ptr(heapVar1));
+
+    // Ausgabe: Wert und Adresse der globalen Variable
+    fmt::print("globalVar: Wert = {}, Adresse = {}\n", globalVar, fmt::ptr(&globalVar));
+
+    // Ausgabe: Wert und Adresse der lokalen Variable
+    fmt::print("localVar: Wert = {}, Adresse = {}\n", localVar, fmt::ptr(&localVar));
+
+    // Ausgabe: Wert und Adresse der Heap-Variable
+    fmt::print("heapVar: Wert = {}, Adresse = {}\n", *heapVar, fmt::ptr(heapVar));
+
+    // Speicher wieder freigeben
     delete heapVar;
-    delete [] heapVar1;
 
+    // Adresse der Funktion foo
+    fmt::print("Adresse von foo: {}\n", fmt::ptr(&foo));
 
+    /*
+    Fazit zu Speichersegmenten in C++:
 
-    fmt::println("------------------------------------------------------------------------------------------------");
-    fmt::println("Adresse von foo: {}", fmt::ptr(&foo));
-    fmt::println("------------------------------------------------------------------------------------------------");
+    - Globale Variablen (wie globalVar) werden im Data-Segment abgelegt und sind während der gesamten Programmlaufzeit verfügbar.
+    - Lokale Variablen (wie localVar) werden auf dem Stack gespeichert. Sie existieren nur innerhalb ihres Gültigkeitsbereichs und werden automatisch verwaltet.
+    - Dynamisch allozierte Variablen (wie heapVar mit new) liegen im Heap. Sie müssen explizit mit delete freigegeben werden und erlauben flexible Speicherverwaltung.
+    - Funktionen (wie foo) befinden sich im Code-Segment.
 
-    int& ref = bss;
-    fmt::println("The value of the variable ref: {} and its address {}", ref, fmt::ptr(&ref));
+    Die Unterscheidung zwischen Stack und Heap ist wichtig, da der Stack begrenzt und schneller ist, aber nur für kurzlebige Daten geeignet. Der Heap bietet mehr Speicher und Flexibilität, benötigt aber manuelle Verwaltung.
 
-    fmt::println("------------------------------------------------------------------------------------------------");
-    foo();
-    foo();
-    fmt::println("------------------------------------------------------------------------------------------------");
-    static_foo();
-    static_foo();
-    fmt::println("------------------------------------------------------------------------------------------------");
-    
-    
-
+    Referenzen und Zeiger sind essenziell, um auf Speicheradressen zuzugreifen. Zeiger sind notwendig, um mit Heap-Speicher zu arbeiten, während Referenzen oft für effiziente Funktionsübergaben genutzt werden.
+    */
 
     return 0; /* exit gracefully*/
 }
