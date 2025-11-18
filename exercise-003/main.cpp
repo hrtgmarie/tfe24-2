@@ -20,6 +20,7 @@ static void print_vector(const std::vector<int> &v)
 
 auto main(int argc, char **argv) -> int
 {
+    auto counter = 5;
     /**
      * CLI11 is a command line parser to add command line options
      * More info at https://github.com/CLIUtils/CLI11#usage

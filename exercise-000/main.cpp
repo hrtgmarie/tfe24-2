@@ -52,5 +52,6 @@ auto main(int argc, char **argv) -> int
     fmt::print("Value after function call: {}\n", value2);
 
 
+    delete pD;
     return 0; /* exit gracefully*/
 }

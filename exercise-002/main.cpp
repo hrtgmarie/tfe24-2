@@ -14,6 +14,10 @@ void foo() {
 
 auto main(int argc, char **argv) -> int
 {
+
+    /*static*/ int localVar = 2;
+    int localVar1;
+
     /**
      * CLI11 is a command line parser to add command line options
      * More info at https://github.com/CLIUtils/CLI11#usage
